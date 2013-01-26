@@ -109,15 +109,29 @@ function playVideo(pl_pos){
 
 
 function youtubeid(url) {
-			var ytid = url.match("[\\?&]v=([^&#]*)");
-			ytid = ytid[1];
-			return ytid;
+	var ytid = url.match("[\\?&]v=([^&#]*)");
+	ytid = ytid[1];
+	return ytid;
 };
+
+function validYoutube(url){
+
+	//check if the video is a valid youtube one
+
+	var validMatch = "(http://)?(www\.)?(youtube|yimg|youtu)\.([A-Za-z]{2,4}|[A-Za-z]{2}\.[A-Za-z]{2})/(watch\?v=)?[A-Za-z0-9\-_]{6,12}(&[A-Za-z0-9\-_]{1,}=[A-Za-z0-9\-_]{1,})*";
+
+	if(validMatch.test(url))
+		return true;
+
+	return false;
+
+
+}
 
 function add_media(url,nome){
 	
-	
-	if(url==null || nome==null || url=="" || nome=="")
+	//check the integrity of the youtube url
+	if(url==null || nome==null || url=="" || nome=="" || !validYoutube(url))
 		return;
 	
 	videoID=youtubeid(url);

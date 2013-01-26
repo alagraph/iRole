@@ -119,7 +119,7 @@ $(function() {
 		  				<div class="answerBoxDate">'.itaTime($PM_obj->getSentDate()).'</div>
 		  				<div class="answerBoxAuth">'.$PM_obj->getSenderNameLink().' -&gt; '.$PM_obj->getRecipientNameLink().'</div>
 		  				<div class="answerBoxMsg">'.acapo($PM_obj->getMessage()).'</div>
-		  			 </div>';
+		  		</div>';
 					
         echo "	</div>
            	  </div>";

@@ -564,7 +564,8 @@ class Character {
 				
 			
 			
-			$this->setCharname("~OLD_{$this->char_id}~".$this->char_name);
+			$this->setCharname("~OLD_{$this->char_id}~".$this->char_name);
+
 
 
 		}
@@ -953,6 +954,7 @@ class Character {
 	}
 
 	public function setAvatarX($key,$value){
+	
 		$this->avatar_OBJ[$key]->setText($value);
 		$this->avatar_OBJ[$key]->writeToDb();
 
