@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html> 
+<head>
+<meta charset="UTF-8" />
+<title>Meteo</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<link href="css/custom-theme/jquery-ui-1.8.13.custom.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="css/jdigiclock.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.6.custom.min.js"></script>
+<script type="text/javascript" src="js/jquery.jdigiclock.js"></script>
+<!--[if IE]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#digiclock').jdigiclock({
+            // Configuration goes here
+            clockImagesPath: 'images/jdigiclock/clock/',
+            weatherImagesPath: 'images/jdigiclock/weather/' ,
+            weatherLocationCode: 'EUR|UK|UK004|CARDIFF'
+        });
+    });
+</script>
+</head>
+<body>
+	<div id="digiclock"></div>
+</body>
+</html>

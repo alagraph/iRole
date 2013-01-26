@@ -1,0 +1,204 @@
+#plugin_container {
+    color: #FFFFFF;
+    font-family: Arial,Verdana,Tahoma,Helvetica,sans-serif;
+    font-size: 11px;
+    height: 200px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: 211px;
+}
+#plugin_container p {
+    margin: 0;
+    padding: 0;
+}
+#left_arrow, #right_arrow {
+    cursor: pointer;
+    display: none;
+    position: absolute;
+    top: 70px;
+    z-index: 200;
+}
+#left_arrow {
+    display: none;
+    left: 0;
+}
+#right_arrow {
+    right: 5px;
+}
+#digital_container {
+    background: url("../images/jdigiclock/background.png") no-repeat scroll 50% 0 transparent;
+    height: 133px;
+    left: 0;
+    position: relative;
+    top: 20px;
+    width: 100%;
+    z-index: 98;
+}
+#clock {
+    left: 14px;
+    position: absolute;
+    top: -20px;
+    width: 182px;
+}
+#hours, #minutes {
+    float: left;
+    height: 100px;
+    position: relative;
+    width: 90px;
+}
+#minutes {
+    margin-left: 0;
+}
+#hours_bg, #minutes_bg {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 99;
+}
+#hours_bg img, #minutes_bg img {
+    width: 100%;
+}
+.first_digit {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 80%;
+    z-index: 100;
+}
+.second_digit {
+    height: 100%;
+    left: 100px;
+    position: absolute;
+    top: 0;
+    width: 80%;
+    z-index: 100;
+}
+img.first_digit, img.second_digit {
+    width: 100%;
+}
+.line {
+    background: none repeat scroll 0 0 #EFEFEF;
+    display: none;
+    font-size: 1px;
+    height: 2px;
+    left: 12px;
+    position: absolute;
+    top: 97px;
+    width: 175px;
+    z-index: 101;
+}
+#am_pm {
+    left: 130px;
+    position: absolute;
+    top: 156px;
+    z-index: 110;
+}
+#weather {
+    color: #FFFFFF;
+    height: 106px;
+    left: 0;
+    position: absolute;
+    top: 68px;
+    width: 100%;
+    z-index: 105;
+}
+#weather #local, #weather .loading {
+    float: left;
+    margin: 0 0 0 9px;
+}
+.city {
+    font-size: 13px;
+    font-weight: bold;
+}
+.temp {
+    font-size: 19px;
+    padding: 0;
+}
+.temp .metric {
+    margin-left: -3px;
+}
+#weather #temp {
+    float: right;
+    margin: 0 11px 0 0;
+    text-align: right;
+}
+#weather #date {
+    font-size: 11pt;
+    padding-right: 2px;
+}
+#forecast_container {
+    background: url("../images/jdigiclock/background_forecast.png") no-repeat scroll 50% 10% transparent;
+    height: 300px;
+    left: 275px;
+    position: absolute;
+    top: 0;
+    width: 250px;
+    z-index: 98;
+}
+#forecast_container #current {
+    height: 240px;
+    margin-left: 50px;
+    position: relative;
+    width: 200px;
+}
+#forecast_container .loading {
+    margin: 175px 0 0 70px;
+}
+#forecast_container #current .temp, #forecast_container #current .high_low {
+    text-align: center;
+    width: 116px;
+}
+#forecast_container #current .temp {
+    float: left;
+    font-size: 32pt;
+    margin-top: 110px;
+}
+#forecast_container #current .high_low {
+    clear: both;
+    font-size: 12pt;
+}
+#forecast_container #current .city, #forecast_container #current .text {
+    text-align: center;
+    width: 100%;
+}
+#forecast_container #current .text {
+    margin-top: 6px;
+}
+#forecast_container #forecast {
+    height: 122px;
+    list-style: none outside none;
+    margin: 0 0 0 50px;
+    padding: 0;
+    width: 400px;
+}
+#forecast_container #forecast li {
+    float: left;
+    height: 100%;
+    text-align: center;
+    width: 25%;
+}
+#forecast_container #forecast li p {
+    font-size: 11pt;
+    height: 30px;
+    line-height: 30px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+#forecast_container #forecast li img {
+    width: 96px;
+}
+#forecast_container #update {
+    font-size: 11px;
+    margin-top: 10px;
+    text-align: center;
+}
+#forecast_container #update img {
+    cursor: pointer;
+    margin: -2px 4px 0 0;
+    vertical-align: middle;
+}
