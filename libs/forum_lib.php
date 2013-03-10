@@ -302,12 +302,18 @@ class ForumPost {
   public function getAuthorId(){
   	return $this->author;
   }
-  public function getTitle($escape=true){
+  public function getTitle($escape=true,$linked=true){
   	
-  	if(!$escape)
-  		return $this->title;
+    $outTitle=$this->title;
+
+    if($escape)
+  		$outTitle=htmlspecialchars($outTitle);
+
+    if($linked)
+      $outTitle="<a href=\"forum_posts.php?f={$this->id}&b={$this->forum_board}\">$outTitle</a>";
+
   	
-  	return htmlspecialchars($this->title);
+  	return $outTitle;
   }
   public function getMessage($bbcode=false){
   	
