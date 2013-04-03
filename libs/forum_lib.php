@@ -307,13 +307,16 @@ class ForumPost {
     $outTitle=$this->title;
 
     if($escape)
-  		$outTitle=htmlspecialchars($outTitle);
+      $outTitle=htmlspecialchars($outTitle);
 
-    if($linked)
-      $outTitle="<a href=\"forum_posts.php?f={$this->id}&b={$this->forum_board}\">$outTitle</a>";
+    if($linked){
+      $fid=$this->post_father == 0 ? $this->id : $this->post_father;
+      $outTitle="<a href=\"forum_posts.php?f={$fid}&b={$this->forum_board}\">$outTitle</a>";
+    }
 
-  	
-  	return $outTitle;
+
+
+    return $outTitle;
   }
   public function getMessage($bbcode=false){
   	
@@ -616,7 +619,7 @@ class ForumBoard {
   			$row['post_father']=$sonOf;
   			
   			if($sonOf!=0)
-  				$row['title']=$this->topics[$sonOf]->getTitle(false);
+  				$row['title']=$this->topics[$sonOf]->getTitle(false,false);
   			
   			$newTopic=new ForumPost($row);
   			$newTopic->writeToDb();

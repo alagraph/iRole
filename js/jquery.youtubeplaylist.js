@@ -1,116 +1,156 @@
-//-------------------------------------------------
-//		youtube playlist jquery plugin
-//		Created by dan@geckonm.com
-//		www.geckonewmedia.com
-//
-//		v1.1 - updated to allow fullscreen 
-//			 - thanks Ashraf for the request
-//-------------------------------------------------
+var player = null;
+var playlist=new Array();
+var playlist_i=0;
 
-jQuery.fn.ytplaylist = function(options) {
- 
-  // default settings
-  var options = jQuery.extend( {
-    holderId: 'ytvideo',
-	playerHeight: '100%',
-	playerWidth: '100%',
-	addThumbs: false,
-	thumbSize: 'small',
-	showInline: false,
-	autoPlay: true,
-	showRelated: false,
-	allowFullScreen: false
-  },options);
- 
-  return this.each(function() {
-							
-   		var selector = $(this);
-		
-		var autoPlay = "";
-		var showRelated = "&rel=0";
-		var fullScreen = "";
-		if(options.autoPlay) autoPlay = "&autoplay=1"; 
-		if(options.showRelated) showRelated = "&rel=1"; 
-		if(options.allowFullScreen) fullScreen = "&fs=1"; 
-		
-		//throw a youtube player in
-		function play(id)
-		{
-		   var html  = '';
-	
-		   html += '<object height="'+options.playerHeight+'" width="'+options.playerWidth+'">';
-		   html += '<param name="movie" value="http://www.youtube.com/v/'+id+'?enablejsapi=1&version=3&playerapiid=ytvideo"> </param>';
-		   html += '<param name="wmode" value="transparent"> </param>';
-		   if(options.allowFullScreen) { 
-		   		html += '<param name="allowfullscreen" value="true"> </param>';
-		   		
-		   }
-		   html += '<embed src="http://www.youtube.com/v/'+id+'?enablejsapi=1&version=3&playerapiid=ytvideo"';
-		   if(options.allowFullScreen) { 
-		   		html += ' allowfullscreen="true" '; 
-		   	}
-		   html += 'type="application/x-shockwave-flash" wmode="transparent"  height="'+options.playerHeight+'" width="'+options.playerWidth+'"></embed>';
-		   html += '</object>';
-			
-		   return html;
-		   
-		};
-		
-		
-		//grab a youtube id from a (clean, no querystring) url (thanks to http://jquery-howto.blogspot.com/2009/05/jyoutube-jquery-youtube-thumbnail.html)
-		function youtubeid(url) {
-			var ytid = url.match("[\\?&]v=([^&#]*)");
-			ytid = ytid[1];
-			return ytid;
-		};
-		
-		
-		//load inital video
-		//var firstVid = selector.children("li:first-child").addClass("currentvideo").children("a").attr("href");
-		//$("#"+options.holderId+"").html(play(youtubeid(firstVid)));
-		
-		//load video on request
-		selector.find("li a").live('click',function() {
-			
-			
-			if(options.showInline) {
-				$("li.currentvideo").removeClass("currentvideo");
-				$(this).parent("li").addClass("currentvideo").html(play(youtubeid($(this).attr("href"))));
-			}
-			else {
-				$("#"+options.holderId+"").html(play(youtubeid($(this).attr("href"))));
-				$(this).parent().parent("ul").find("li.currentvideo").removeClass("currentvideo");
-				$(this).parent("li").addClass("currentvideo");
-			}
-															 
-			
-			
-			return false;
-		});
-		
-		//do we want thumns with that?
-		if(options.addThumbs) {
-			
-			selector.children().each(function(i){
-											  
-				var replacedText = $(this).text();
-				
-				if(options.thumbSize == 'small') {
-					var thumbUrl = "http://img.youtube.com/vi/"+youtubeid($(this).children("a").attr("href"))+"/2.jpg";
-				}
-				else {
-					var thumbUrl = "http://img.youtube.com/vi/"+youtubeid($(this).children("a").attr("href"))+"/0.jpg";
-				}
-				
-				
-				$(this).children("a").empty().html("<img src='"+thumbUrl+"' alt='"+replacedText+"' />"+replacedText).attr("title", replacedText);
-				
-			});	
-			
-		}
-			
-		
-   
-  });
- 
+function onYouTubePlayerReady(player_id) {
+  
+  if(player==null)
+  	return;
+  
+  player.addEventListener('onStateChange', 'playerStateChanged');
+  playVideo(playlist_i);
+
 };
+
+function playerStateChanged(state) {
+
+  if(player==null)
+  	return;
+  
+  if (state == 0) {
+  	
+  	playlist_i++;
+  	
+  	//se c'è solo un video mi fermo
+  	if(playlist.length == 1)
+  		return;
+  	
+  	//se sono all'ultima ricomincio
+  	if(playlist_i==playlist.length)
+  		playlist_i=0;
+  		
+  	playVideo(playlist_i);
+  }
+};
+
+function playVideo(pl_pos){
+	
+	if(player==null)
+  		return;
+  	
+  	if(pl_pos>=playlist.length)
+  		return;
+  		
+  	playlist_i=pl_pos;
+  	
+  	//aggiungo l'attributo di selezione
+  	$(".media_list li a").removeClass("currentvideo");
+  	$(".media_list li a[pl_pos='"+pl_pos+"']").addClass("currentvideo");
+	
+	player.loadVideoById(playlist[playlist_i]);	
+}
+
+
+function youtubeid(url) {
+	var ytid = url.match("[\\?&]v=([^&#]*)");
+	ytid = ytid[1];
+	return ytid;
+};
+
+function validYoutube(url){
+
+	//check if the video is a valid youtube one
+
+	//var validMatch = "(http://)?(www\.)?(youtube|yimg|youtu)\.([A-Za-z]{2,4}|[A-Za-z]{2}\.[A-Za-z]{2})/(watch\?v=)?[A-Za-z0-9\-_]{6,12}(&[A-Za-z0-9\-_]{1,}=[A-Za-z0-9\-_]{1,})*";
+
+	//if(validMatch.test(url))
+		return true;
+
+	return false;
+
+
+}
+
+function youtubeid(url) {
+	var ytid = url.match("[\\?&]v=([^&#]*)");
+
+	if ( ytid==null) return 0;
+
+	ytid = ytid[1];
+	return ytid;
+};
+
+function add_media(url,nome){
+	
+	//check the integrity of the youtube url
+	if(url==null || nome==null || url=="" || nome=="" || !validYoutube(url))
+		return;
+	
+	videoID=youtubeid(url)
+	if( videoID <= 0) return;
+	
+	//controllo che non ci sia già nella lista
+	for(i=0;i<playlist.length;i++)
+		if(playlist[i]==videoID) return;
+		
+	//se non c'è lo pusho
+	playlist.push(videoID);
+	
+	if(player==null){
+		
+		 var params = { allowScriptAccess: "always"};
+  		 var atts = { id: "ytplayer" };
+         swfobject.embedSWF("http://www.youtube.com/v/"+videoID+"?enablejsapi=1&playerapiid=ytplayer&version=3",
+	                       "ytvideocontent", "100%", "100%", "8", null, null, params, atts);
+  
+		player=document.getElementById("ytplayer");
+		
+	}
+	
+	p=(playlist.length)-1;
+	var elem=$("<li><a href=\""+url+"\" pl_pos=\""+p+"\" >"+nome+"</a></li>");
+	$(".media_list").append(elem);
+	
+	
+	elem.find("a").click(function(){
+		playVideo($(this).attr("pl_pos"));
+		return false;
+	});
+	
+	/*
+	if($(".media_list li").size() <= 1){
+		elem.find("a").click();
+	}
+	*/
+	
+	//faccio rimbalzare il div
+	$("#mediaplayer_tab span").html($(".media_list li").size());
+	
+	
+}
+
+var show_media=0;
+
+function toggle_media(){
+	
+	calW=($(".yt_holder").height())+1;
+	
+	if(show_media==1){ //nascondo
+		
+		$("#media_player").animate({
+		    top: -(calW)+"px"
+		  }, 500, function() {
+		    // Animation complete.
+			show_media=0;
+		  });
+	}else{ //lo mostro
+		$("#media_player").animate({
+		    top: 0
+		  }, 500, function() {
+		    // Animation complete.
+			show_media=1;
+		  });
+	}
+	
+	
+}

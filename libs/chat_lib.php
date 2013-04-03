@@ -488,7 +488,8 @@ class chat_message {
           $class="chat_inwhisp";
           $print="<div class=\"$class\">$time {$this->char_name} ti sussurra: {$this->message}</div>";
         }
-        elseif ($xtend){
+        elseif ($xtend && $_SESSION['modlevel'] >= $GLOBALS['admin_view_whisper'] ){
+
           $class="chat_adminwhisp";
           $destCharObj=new Character($this->char_id_dest);
           $destCharObj->checkExistance();

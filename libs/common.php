@@ -110,6 +110,11 @@ function include_headers($arr=null){
 			case 'swfobj':
 				echo '<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 				';
+				break;
+
+			case 'youtube':
+				echo '<script src="js/jquery.youtubeplaylist.js"></script>
+				';
 				break; 
 			
 			default:

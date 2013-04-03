@@ -351,8 +351,6 @@ class Xchar {
 	private $edit_time;
 	private $edit_by;
 
-
-
 	public function __construct($row=null) {
 		global $avatar_fields;
 
