@@ -53,6 +53,7 @@ $_SESSION['modlevel']=$MyChar_obj->Account()->getModLevel();
       <li><a href="admin_pm.php" class="mainMenu">Visione Messaggi Privati</a></li>
       <li><a href="admin_chatlog.php" class="mainMenu">Visione log Chat</a></li>
       <li><a href="admin_setrights.php" class="mainMenu">Imposta permessi utente</a></li>
+      <li><a href="admin_setconfig.php" class="mainMenu">Opzioni land</a></li>
     <? } ?>
       <li><a href="item_shop.php" class="mainMenu">Acquista Oggetti </a></li>
       <!--<li><a href="meteo.php" class="mainMenu">Meteo</a></li>-->
