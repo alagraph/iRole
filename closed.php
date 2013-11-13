@@ -9,13 +9,13 @@
 	//stampa della ragione di chiusura del sito
 	switch ($_GET['c']) {
 		case 2:
-			echo $_GET['c'] . "Siamo temporaneamente in fase di manutenzione.<br>Torneremo operativi al più presto.";
+			echo "Siamo temporaneamente in fase di manutenzione.<br>Torneremo operativi al più presto.";
 			break;
 		case 3:
-			echo $_GET['c'] . "Siamo chiusi a tempo indeterminato.<br>Ci scusiamo per il disagio arrecato.";
+			echo "Siamo chiusi a tempo indeterminato.<br>Ci scusiamo per il disagio arrecato.";
 			break; 
 		default:
-			echo $_GET['c'] . "Siamo temporaneamente chiusi.<br>Torneremo operativi al più presto.";
+			echo "Siamo temporaneamente chiusi.<br>Torneremo operativi al più presto.";
 			break;
 	}
 ?>
