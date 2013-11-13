@@ -212,21 +212,34 @@ $(document).ready(function(){
 	$('a:not(.popUp,.ui-datepicker-calendar a,.deletePm,.ui-autocomplete a)').live('click', function() {
 	  // Live handler called.
 	  
-	  stop_timers();
+	  loadPage($(this).attr('href'));
+	  history.pushState({page: $(this).attr('href')},null,null);
 	  
-	  if(xhr)  xhr.abort();
-	  xhr = $.ajax({
-		    url : $(this).attr('href'),
-		    success : function(data2) {
-		        $("#content").stop(true,true).fadeTo(400,0,function(){
-					$('#content').scrollTop(0).html(data2).fadeTo(400,1);
-				});
-		    }
-	  });
 	  
 	  return false;
 	  
 	});
+
+	loadPage = function(loadurl,historyback) {
+    	stop_timers();
+	  
+		if(xhr)  xhr.abort();
+		xhr = $.ajax({
+			    url : loadurl,
+			    success : function(data2) {
+
+			        $("#content").stop(true,true).fadeTo(400,0,function(){
+						$('#content').scrollTop(0).html(data2).fadeTo(400,1);
+					});
+			    }
+		});
+
+  	};
+
+	$(window).on("popstate", function(data) {
+    	console.log("pop: " + data.originalEvent.state.page);
+    	loadPage(data.originalEvent.state.page,true);
+  	});
 	
 	$(".deletePm").live('click',function(){
 			

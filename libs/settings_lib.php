@@ -405,7 +405,8 @@ class LandSetting {
 	private $var_name;
 	private $value;
 	private $description;	
-	
+	private $accepted_values;
+
 	public function __construct($row=null,$id=null) {
 			
 		if (isset($id)){
@@ -424,45 +425,66 @@ class LandSetting {
 			
 		if(isset($row)){
 			
-		if (isset($row['id']) && $row['id']!="") $this->id=$row['id'];
-		if (isset($row['type']) && $row['type']!=""){
-			$this->type=intval($row['type']);
-		if($this->type<0)
-			$this->type=0;
-		if($this->type>count($GLOBALS['types_levels'])-1)
-			$this->type=count($GLOBALS['types_levels'])-1;
+			if (isset($row['id']) && $row['id']!="") $this->id=$row['id'];
 			
-		}
-		if (isset($row['var_name']) && $row['var_name']!=""){
-			$this->var_name=$row['var_name'];
-		}else{
-			//throw new Exception("Errore, nome variabile nullo.");	
-		}
-		if (isset($row['value']) && $row['value']!=""){
-			$this->value=$this->chkRangeLv($row['value']);
-			
-		}else{
-			//throw new Exception("Errore, valore non accettato.");
-		}
+			/*
+			if (isset($row['type']) && $row['type']!=""){
+				$this->type=intval($row['type']);
+			if($this->type<0)
+				$this->type=0;
+			if($this->type>count($GLOBALS['types_levels'])-1)
+				$this->type=count($GLOBALS['types_levels'])-1;
+				
+			}
+			*/
 
+			if (isset($row['type']) && $row['type']!="") $this->type=$row['type'];
+
+
+			if (isset($row['var_name']) && $row['var_name']!=""){
+				$this->var_name=$row['var_name'];
+			}else{
+				//throw new Exception("Errore, nome variabile nullo.");	
+			}
+			
+			if (isset($row['value']) && $row['value']!="") $this->value=$row['value'];
+		
 			if (isset($row['description'])) $this->description=$row['description'];
+
+			if (isset($row['accepted_values'])) $this->accepted_values=$row['accepted_values'];
 			
 		}
 	}
 	
 	public function setValue($value){
 		
-	if (isset($this->id)){
-		$this->value=$this->chkRangeLv($value);
+		if (isset($this->id)){
+			$this->value=$value;
+			
+			$query="UPDATE config_landsettings SET value='{$this->value}' WHERE id='{$this->id}'";
+			$result = mysql_query($query) or die(mysql_error());
+			
+			return true;  
+		}
 		
-		$query="UPDATE config_landsettings SET value='{$this->value}' WHERE id='{$this->id}'";
-		$result = mysql_query($query) or die(mysql_error());
+		return false;
+	}
+
+	/*
+	public function setValueKind($value,$kind){
 		
-		return true;  
+		if (isset($this->id)){
+			
+			$query="UPDATE config_landsettings SET value='{$value}', type='{$kind}' WHERE id='{$this->id}'";
+			$result = mysql_query($query) or die(mysql_error());
+			
+			return true;  
+		}
+		
+		return false;
 	}
-	
-	return false;
-	}
+	*/
+
 	
 	public function writeToDb(){
 		
@@ -471,14 +493,16 @@ class LandSetting {
 							type='{$this->type}',
 							var_name='{$this->var_name}',
 							value='{$this->value}',
-							description='{$this->description}'
+							description='{$this->description}',
+							accepted_values='{$this->accepted_values}'
 							WHERE id='{$this->id}'";      
 		}else{
 			$query="INSERT INTO config_landsettings SET
 							type='{$this->type}',
 							var_name='{$this->var_name}',
 							value='{$this->value}',
-							description='{$this->description}'"; 
+							description='{$this->description}',
+							accepted_values='{$this->accepted_values}'"; 
 		}
 		
 		if (isset($query)){
@@ -502,8 +526,20 @@ class LandSetting {
 	public function getVarName(){
 		return $this->var_name;
 	}
-	public function getValue(){
+	public function getValue($decode=true){
+		
+		if($this->type=="array" && $decode)
+			return json_decode($this->value,true);
+
 		return $this->value;
+	}
+	public function getAcceptedValues(){
+		
+		if(isset($this->accepted_values) && !empty($this->accepted_values) && $this->accepted_values!="")
+			return json_decode($this->accepted_values);
+
+		return null;
+
 	}
 	public function getDescription(){
 		return $this->description;
@@ -529,7 +565,7 @@ class LandSettingsList {
 
 	public function loadSettings(){
 			
-		$config_load_query="SELECT * FROM config_landsettings ORDER BY type";
+		$config_load_query="SELECT * FROM config_landsettings";
 		
 		$config_load_result=mysql_query($config_load_query) or die(mysql_error());
 		
