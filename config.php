@@ -50,9 +50,9 @@
 		${$v->getVarName()} = $v->getValue();
 	}
 
-	//force some values for not-dinamyc vars
+	//force some values for not-dynamic vars
 
-	$url_land='http://'.$_SERVER['SERVER_NAME'];
+	$url_land='http://'.$_SERVER['HTTP_HOST'];
 
 	if ($closed != 0)
 		header("Location: closed.php?c=$closed");
@@ -70,7 +70,7 @@
 	$n_car = 0;
 	$name_car = array_flip($name_car);
 	foreach ($name_car as $key => $value) {
-		$value = $default_value_single_field_at_signup;
+		$name_car[$key] = $default_value_single_field_at_signup;
 		$n_car++;
 	}
 

@@ -248,8 +248,8 @@ function show_onlineList($roomR,$stretchR,$ShowGroups=true){
 	while ($row=mysql_fetch_array($result)){
 		$room=$row['roomname'];
 		$char_obj=new Character(null,$row['name']);
-		$maleicon="<img src=\"images/icons/male-icon.png\" alt=\"maschio\" title=\"maschio\" />";
-  		$femaleicon="<img src=\"images/icons/female-icon.png\" alt=\"femmina\" title=\"femmina\" />";
+		$maleicon="<img src=\"css/images/male-icon.png\" alt=\"maschio\" title=\"maschio\" />";
+  		$femaleicon="<img src=\"css/images/female-icon.png\" alt=\"femmina\" title=\"femmina\" />";
 		$icons="";
 			
 		if($ShowGroups){
