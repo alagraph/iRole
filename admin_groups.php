@@ -109,7 +109,7 @@ if(isset($_REQUEST['element_delete_nG'])){
 	$delElem = new GroupElement(null,$_REQUEST['element_delete_nG']);
 
 	if($delElem->deleteElement()){
-		echo "Element cancellato correttamente";
+		echo "Elemento cancellato correttamente";
 	}else{
 		echo "Impossibile cancellare Elemento";
 	}
