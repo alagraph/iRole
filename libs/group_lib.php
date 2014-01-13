@@ -164,6 +164,8 @@ class GroupElement {
 				
 			}
 
+			//faccio la stessa cosa con gli oggetti
+
 			return true;
 		}
 	}
@@ -171,6 +173,12 @@ class GroupElement {
 	public function LeaveGroup($joinid) {
 
 		if (isset($this -> id)) {
+
+
+			//controllo quali abilità/oggetti vengono automaticamente assegnati a questo elemento, e li rimuovo
+
+
+
 
 			$curdate = date("YmdHis");
 			$query = "UPDATE groups_joined SET
@@ -184,6 +192,37 @@ class GroupElement {
 		}
 
 		return false;
+
+	}
+
+	public function deleteElement(){
+
+		//find the char that joined this element
+        if (isset($this -> id)) {
+
+			$curdate = date("YmdHis");
+			$query = "SELECT char_id
+					  FROM groups_joined
+					  WHERE group_id ='{$this->id}'";
+			
+			$result = mysql_query($query) or die(mysql_error());
+
+			while ($row = mysql_fetch_array($result)) {
+				$this->LeaveGroup($row['char_id']);
+			}
+
+			//finally remove the group element
+
+			$query = "DELETE FROM groups_element
+					  WHERE id ='{$this->id}'";
+			mysql_query($query) or die(mysql_error());
+
+
+			return true;
+		}
+
+		return false;
+
 
 	}
 
