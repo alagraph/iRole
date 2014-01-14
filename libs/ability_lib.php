@@ -123,7 +123,7 @@ class BuyedAbility {
 			$this->ability_id = $this->ability->getId();
 			$this->char_id = $char_id;
 
-			query="DELETE FROM abilities_buyed WHERE ability_id='{$this->ability_id}' AND char_id='{$this->char_id}' ";
+			$query="DELETE FROM abilities_buyed WHERE ability_id='{$this->ability_id}' AND char_id='{$this->char_id}' ";
 		}
 
 		if($query!=""){

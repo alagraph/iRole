@@ -154,7 +154,7 @@ class BuyedItem {
 			$this->item_id = $this->item->getId();
 			$this->char_id = $char_id;
 
-			query="DELETE FROM items_buyed WHERE item_id='{$this->item_id}' AND char_id='{$this->char_id}' ";
+			$query="DELETE FROM items_buyed WHERE item_id='{$this->item_id}' AND char_id='{$this->char_id}' ";
 		}
 
 		if($query!=""){
