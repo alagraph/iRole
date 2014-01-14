@@ -79,23 +79,23 @@ class GroupElement {
 
 		if (isset($this -> id)) {//l'id è settato, faccio l'update
 			$query = "UPDATE groups_element SET
-              element_name='{$this->element_name}',
-              element_image='{$this->element_image}',
-              create_date='{$this->create_date}',
-              id_group='{$this->id_group}',
-              group_admin='{$this->group_admin}',
-              
-              salary='{$this->salary}'
-              WHERE id='{$this->id}'";
+			element_name='{$this->element_name}',
+			element_image='{$this->element_image}',
+			create_date='{$this->create_date}',
+			id_group='{$this->id_group}',
+			group_admin='{$this->group_admin}',
+
+			salary='{$this->salary}'
+			WHERE id='{$this->id}'";
 		} else {
 			$query = "INSERT INTO groups_element SET
-              element_name='{$this->element_name}',
-              element_image='{$this->element_image}',
-              create_date='{$this->create_date}',
-              id_group='{$this->id_group}',
-              group_admin='{$this->group_admin}',
-              `default`='{$this->default}',
-              salary='{$this->salary}'";
+			element_name='{$this->element_name}',
+			element_image='{$this->element_image}',
+			create_date='{$this->create_date}',
+			id_group='{$this->id_group}',
+			group_admin='{$this->group_admin}',
+			`default`='{$this->default}',
+			salary='{$this->salary}'";
 		}
 
 		if (isset($query)) {
@@ -105,7 +105,7 @@ class GroupElement {
 			return 0;
 		}
 
-		return -1;
+	return -1;
 		//ritorno -1 quando non son riuscito a scrivere
 	}
 
@@ -124,13 +124,13 @@ class GroupElement {
 	public function JoinGroup($charObj) {
 		if (isset($this -> id)) {
 
-			//$charObj= new Character();
+				//$charObj= new Character();
 			$charid = $charObj -> getCharId();
 
 			if (!$GLOBALS['allow_multigroup_sametype']) {
-				//controllo che l'utente non sia gruppato in gruppi dello stesso tipo
+					//controllo che l'utente non sia gruppato in gruppi dello stesso tipo
 				foreach ($charObj->getGroups() as $k => $v) {
-					//$v=new GroupElement();
+						//$v=new GroupElement();
 					if ($v -> getGroupType() == $this -> groupType && $v -> getGroup() != $this -> id_group)
 						return false;
 				}
@@ -138,72 +138,101 @@ class GroupElement {
 
 			$curdate = date("YmdHis");
 			$query = "INSERT INTO groups_joined SET
-              char_id='{$charid}',
-              group_id='{$this->id}',
-              joindate='{$curdate}',
-              active=1";
+			char_id='{$charid}',
+			group_id='{$this->id}',
+			joindate='{$curdate}',
+			active=1";
 
 			$query2 = "UPDATE groups_joined SET
-              active=0
-              WHERE group_id IN (SELECT id from groups_element WHERE id_group='{$this->id_group}') AND char_id='{$charid}'";
+			active=0
+			WHERE group_id IN (SELECT id from groups_element WHERE id_group='{$this->id_group}') AND char_id='{$charid}'";
 
 			mysql_query($query2) or die(mysql_error());
 			mysql_query($query) or die(mysql_error());
-			
-			//$charObj=new Character();
+
+				//$charObj=new Character();
 			$charObj->parseFromDb();
 			$charObj->readGroups();
-			
-			//controllo quali abilità vengono automaticamente assegnate a questo elemento
+
+				//controllo quali abilità vengono automaticamente assegnate a questo elemento
 			$abList=new AbilityList();
 			$abList->populateList(null,$this->id);
 			foreach($abList->getList() as $k=>$v){
-				//$v=new Ability();
+					//$v=new Ability();
 				if($v->isBuyable($charObj))
 					$v->BuyAbility($charObj,true);
-				
+
 			}
 
-			//faccio la stessa cosa con gli oggetti
+				//faccio la stessa cosa con gli oggetti
+			$itList=new ItemList();
+			$itList->populateList(null,$this->id);
+			foreach($itList->getList() as $k=>$v){
+					//$v=new Item();
+				if($v->isBuyable($charObj))
+					$v->BuyItem($charObj,true);
+
+			}
 
 			return true;
 		}
 	}
 
-	public function LeaveGroup($joinid) {
+	public function LeaveGroup($leaving_char_id) {
 
-		if (isset($this -> id)) {
-
-
-			//controllo quali abilità/oggetti vengono automaticamente assegnati a questo elemento, e li rimuovo
+		if (isset($this->id_group)) {
 
 
+				//controllo quali abilità/oggetti vengono automaticamente assegnati a questo elemento, e li rimuovo
+			$abList=new AbilityList();
+			$abList->populateList(null,$this->id);
+			foreach($abList->getList() as $k=>$v){
+				//$v=new Ability();
+				if($v->getAutoRemove()){ //remove it
+					$delAb=new BuyedAbility();
+					$delAb->deleteBuyedAbility($leaving_char_id,$v);
+
+				} 	
+			}
+
+			$itList=new ItemList();
+			$itList->populateList(null,$this->id);
+			foreach($itList->getList() as $k=>$v){
+				//$v=new Item();
+				if($v->getAutoRemove()){ //remove it
+					$delItem=new BuyedItem();
+					$delItem->deleteBuyedItem($leaving_char_id,$v);
+
+				} 
+
+				
+			}
 
 
 			$curdate = date("YmdHis");
 			$query = "UPDATE groups_joined SET
-              leavedate='{$curdate}',
-              active=0
-              WHERE group_id IN (SELECT id from groups_element WHERE id_group='{$this->id_group}')
-              AND char_id='{$joinid}'";
+			leavedate='{$curdate}',
+			active=0
+			WHERE group_id IN (SELECT id from groups_element WHERE id_group='{$this->id_group}')
+			AND char_id='{$leaving_char_id}'";
 
 			mysql_query($query) or die(mysql_error());
 			return true;
 		}
 
-		return false;
+			return false;
 
 	}
 
 	public function deleteElement(){
 
 		//find the char that joined this element
-        if (isset($this -> id)) {
+		if (isset($this -> id)) {
 
 			$curdate = date("YmdHis");
 			$query = "SELECT char_id
-					  FROM groups_joined
-					  WHERE group_id ='{$this->id}'";
+			FROM groups_joined
+			WHERE group_id ='{$this->id}'";
 			
 			$result = mysql_query($query) or die(mysql_error());
 
@@ -214,7 +243,7 @@ class GroupElement {
 			//finally remove the group element
 
 			$query = "DELETE FROM groups_element
-					  WHERE id ='{$this->id}'";
+			WHERE id ='{$this->id}'";
 			mysql_query($query) or die(mysql_error());
 
 
@@ -346,247 +375,246 @@ class Group {
 	public function writeToDb() {
 
 		if (isset($this -> id)) {//l'id è settato, faccio l'update
-			$query = "UPDATE groups SET
-              name='{$this->name}',
-              type='{$this->typeG}',
-              create_date='{$this->create_date}',
-              logo='{$this->logo}',
-              website='{$this->website}',
-              statute='{$this->statute}'
-              WHERE id='{$this->id}'";
-		} else {
-			$query = "INSERT INTO groups SET
-              name='{$this->name}',
-              type='{$this->typeG}',
-              create_date='{$this->create_date}',
-              logo='{$this->logo}',
-              website='{$this->website}',
-              statute='{$this->statute}'";
+		$query = "UPDATE groups SET
+		name='{$this->name}',
+		type='{$this->typeG}',
+		create_date='{$this->create_date}',
+		logo='{$this->logo}',
+		website='{$this->website}',
+		statute='{$this->statute}'
+		WHERE id='{$this->id}'";
+	} else {
+		$query = "INSERT INTO groups SET
+		name='{$this->name}',
+		type='{$this->typeG}',
+		create_date='{$this->create_date}',
+		logo='{$this->logo}',
+		website='{$this->website}',
+		statute='{$this->statute}'";
+	}
+
+	if (isset($query)) {
+
+		$result = mysql_query($query) or die(mysql_error());
+		if (!isset($this -> id))
+			$this -> id = mysql_insert_id();
+		return 0;
+	}
+
+	return -1;
+		//ritorno -1 quando non son riuscito a scrivere
+}
+
+public function loadElements($OnlyDefault=false) {
+
+	if (isset($this -> id)) {
+
+
+		$counter=0;
+
+		if($OnlyDefault)
+			$sel="AND `default`=1";
+
+
+		$query = "SELECT ge.* FROM groups_element ge WHERE ge.id_group='{$this->id}' $sel order by ge.id";
+		$result = mysql_query($query) or die(mysql_error());
+
+		while ($row = mysql_fetch_array($result)) {
+			$row['grouptype'] = $this -> typeG;
+			$tmpE = new GroupElement($row);
+			$this -> group_elements[$tmpE -> getId()] = $tmpE;
+			$counter++;
 		}
+		
+		return $counter;
+	}
+}
+
+public function storeImage($img, $ext) {
+
+	echo $ext;
+
+	if (isset($this -> id) && isset($img) && $img != '') {
+		echo "lol2 $img";
+
+		$upload = new Upload($img, $GLOBALS['group_img_dir'], $this -> id . "." . $ext);
+		$this -> logo = $GLOBALS['group_img_dir'] . $upload -> GetFileName();
+		@unlink($this -> logo);
+		$upload -> UploadFile();
+		$this -> writeToDb();
+	}
+
+}
+
+public function setStatute($txt) {
+
+	if (!isset($this -> id))
+		return false;
+
+	$this -> statute = $txt;
+
+	$query = "UPDATE groups SET statute='{$this->statute}' WHERE id='{$this->id}'";
+	mysql_query($query) or die(mysql_error());
+
+}
+
+public function deleteGroup($myAcc) {
+
+	if (isset($this -> id)) {
+
+		//flaggo come cancellato
+		$query = "UPDATE groups SET deleted=1 WHERE id='{$this->id}'";
+		mysql_query($query) or die(mysql_error());
+
+		//sbatto fuori gli utenti
+		if (empty($this -> group_members))
+			$this -> loadMembers();
+		foreach ($this->group_members as $key => $value) {
+			$value -> getElemObj() -> LeaveGroup($value->getCharObj()->getCharId());
+		}
+
+		//scrivo i logs
+		$log = new Log();
+		$log -> newLog($myAcc -> getId(), $this -> id, "Cancellato gruppo {$this->name}", 11);
+
+		return true;
+	}
+
+	return false;
+
+}
+
+public function undeleteGroup($myAcc) {
+
+	if (isset($this -> id)) {
+
+		$query = "UPDATE groups SET deleted=0 WHERE id='{$this->id}'";
+		mysql_query($query) or die(mysql_error());
+
+			//scrivo i logs
+		$log = new Log();
+		$log -> newLog($myAcc -> getId(), $this -> id, "Ripristinato gruppo {$this->name}", 10);
+
+		return true;
+
+	}
+
+	return false;
+
+}
+
+public function loadMembers($onlyactive = true, $onlyadmin = false, $orderbyrank = false) {
+
+	if (isset($this -> id)) {
+
+			//se non ho ancora caricato gli elementi li carico
+		if (empty($this -> group_elements))
+			$this -> loadElements();
+
+		$selMax = "";
+		if ($onlyactive) {
+			$sel .= " AND jd.active=1 AND jd.leavedate < jd.joindate";
+		}
+		if ($onlyadmin) {
+			$sel .= " AND ge.group_admin='{$onlyadmin}'";
+		}
+
+		if ($orderbyrank) {
+			$ord = "ORDER BY ge.id";
+		} else {
+			$ord = "ORDER BY joinedid";
+		}
+
+		$query = "
+		SELECT ge.id AS elementid, c.name AS charname, c.id AS charid, jd.id AS joinedid
+
+		FROM 
+		`groups_joined` jd
+
+		INNER JOIN `character` c
+		ON c.id=jd.char_id
+		INNER JOIN groups_element ge
+		ON ge.id=jd.group_id
+		INNER JOIN groups g
+		ON ge.id_group=g.id
+		WHERE g.id='{$this->id}' {$sel}
+		$ord";
 
 		if (isset($query)) {
 
-			$result = mysql_query($query) or die(mysql_error());
-			if (!isset($this -> id))
-				$this -> id = mysql_insert_id();
-			return 0;
-		}
-
-		return -1;
-		//ritorno -1 quando non son riuscito a scrivere
-	}
-
-	public function loadElements($OnlyDefault=false) {
-
-		if (isset($this -> id)) {
-			
-			
-			$counter=0;
-			
-			if($OnlyDefault)
-				$sel="AND `default`=1";
-			
-			
-			$query = "SELECT ge.* FROM groups_element ge WHERE ge.id_group='{$this->id}' $sel order by ge.id";
-			$result = mysql_query($query) or die(mysql_error());
-
-			while ($row = mysql_fetch_array($result)) {
-				$row['grouptype'] = $this -> typeG;
-				$tmpE = new GroupElement($row);
-				$this -> group_elements[$tmpE -> getId()] = $tmpE;
-				$counter++;
-			}
-		
-			return $counter;
-		}
-	}
-
-	public function storeImage($img, $ext) {
-
-		echo $ext;
-
-		if (isset($this -> id) && isset($img) && $img != '') {
-			echo "lol2 $img";
-
-			$upload = new Upload($img, $GLOBALS['group_img_dir'], $this -> id . "." . $ext);
-			$this -> logo = $GLOBALS['group_img_dir'] . $upload -> GetFileName();
-			@unlink($this -> logo);
-			$upload -> UploadFile();
-			$this -> writeToDb();
-		}
-
-	}
-
-	public function setStatute($txt) {
-
-		if (!isset($this -> id))
-			return false;
-
-		$this -> statute = $txt;
-
-		$query = "UPDATE groups SET statute='{$this->statute}' WHERE id='{$this->id}'";
-		mysql_query($query) or die(mysql_error());
-
-	}
-
-	public function deleteGroup($myAcc) {
-
-		if (isset($this -> id)) {
-
-			//flaggo come cancellato
-			$query = "UPDATE groups SET deleted=1 WHERE id='{$this->id}'";
-			mysql_query($query) or die(mysql_error());
-
-			//sbatto fuori gli utenti
-			if (empty($this -> group_members))
-				$this -> loadMembers();
-			foreach ($this->group_members as $key => $value) {
-				$value -> getElemObj() -> LeaveGroup($key);
-			}
-
-			//scrivo i logs
-			$log = new Log();
-			$log -> newLog($myAcc -> getId(), $this -> id, "Cancellato gruppo {$this->name}", 11);
-
-			return true;
-		}
-
-		return false;
-
-	}
-
-	public function undeleteGroup($myAcc) {
-
-		if (isset($this -> id)) {
-
-			$query = "UPDATE groups SET deleted=0 WHERE id='{$this->id}'";
-			mysql_query($query) or die(mysql_error());
-
-			//scrivo i logs
-			$log = new Log();
-			$log -> newLog($myAcc -> getId(), $this -> id, "Ripristinato gruppo {$this->name}", 10);
-
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-	public function loadMembers($onlyactive = true, $onlyadmin = false, $orderbyrank = false) {
-
-		if (isset($this -> id)) {
-
-			//se non ho ancora caricato gli elementi li carico
-			if (empty($this -> group_elements))
-				$this -> loadElements();
-
-			$selMax = "";
-			if ($onlyactive) {
-				$sel .= " AND jd.active=1 AND jd.leavedate < jd.joindate";
-			}
-			if ($onlyadmin) {
-				$sel .= " AND ge.group_admin='{$onlyadmin}'";
-			}
-
-			if ($orderbyrank) {
-				$ord = "ORDER BY ge.id";
-			} else {
-				$ord = "ORDER BY joinedid";
-			}
-
-			$query = "
-      		SELECT ge.id AS elementid, c.name AS charname, c.id AS charid, jd.id AS joinedid
-
-			FROM 
-			`groups_joined` jd
-			
-			INNER JOIN `character` c
-			ON c.id=jd.char_id
-			INNER JOIN groups_element ge
-			ON ge.id=jd.group_id
-			INNER JOIN groups g
-			ON ge.id_group=g.id
-			WHERE g.id='{$this->id}' {$sel}
-			$ord";
-
-			if (isset($query)) {
-
 				//echo $query;
 
-				$result = mysql_query($query) or die(mysql_error());
-				while ($row = mysql_fetch_array($result)) {
+			$result = mysql_query($query) or die(mysql_error());
+			while ($row = mysql_fetch_array($result)) {
 
-					//creo l'oggetto character
-					$char = new Character($row['charid'], $row['charname']);
+				//creo l'oggetto character
+				$char = new Character($row['charid'], $row['charname']);
 
-					//li do alla GroupMember
-					$groupmember = new GroupMember($this, $this -> group_elements[$row['elementid']], $char);
+				//li do alla GroupMember
+				$groupmember = new GroupMember($this, $this -> group_elements[$row['elementid']], $char);
 
-					//inserisco la GroupMember nella mia lista
-					$this -> group_members[$row['joinedid']] = $groupmember;
-					$this -> total_members++;
-
-				}
+				//inserisco la GroupMember nella mia lista
+				$this -> group_members[$row['joinedid']] = $groupmember;
+				$this -> total_members++;
 			}
 		}
-
 	}
 
-	public function getName() {
-		return $this -> name;
-	}
+}
 
-	public function getLogo($tag = false) {
+public function getName() {
+	return $this -> name;
+}
 
-		if ($tag && strlen($this -> logo) > 4)
-			return "<img src=\"$this->logo\" alt=\"{$this->name}\"/>";
+public function getLogo($tag = false) {
 
-		return $this -> logo;
-	}
+	if ($tag && strlen($this -> logo) > 4)
+		return "<img src=\"$this->logo\" alt=\"{$this->name}\"/>";
 
-	public function getTypeN() {
-		return $this -> typeG;
-	}
+	return $this -> logo;
+}
 
-	public function getTypeName() {
-		return $this -> typeName;
-	}
+public function getTypeN() {
+	return $this -> typeG;
+}
 
-	public function getId() {
-		return $this -> id;
-	}
+public function getTypeName() {
+	return $this -> typeName;
+}
 
-	public function getSite() {
-		return $this -> website;
-	}
+public function getId() {
+	return $this -> id;
+}
 
-	public function getStatute() {
-		return $this -> statute;
-	}
+public function getSite() {
+	return $this -> website;
+}
 
-	public function getElements() {
-		return $this -> group_elements;
-	}
+public function getStatute() {
+	return $this -> statute;
+}
 
-	public function getMembers() {
-		if (empty($this -> group_members))
-			$this -> loadMembers();
+public function getElements() {
+	return $this -> group_elements;
+}
 
-		return $this -> group_members;
-	}
+public function getMembers() {
+	if (empty($this -> group_members))
+		$this -> loadMembers();
 
-	public function getNumMembers() {
-		if (empty($this -> group_members))
-			$this -> loadMembers();
+	return $this -> group_members;
+}
 
-		return $this -> total_members;
-	}
+public function getNumMembers() {
+	if (empty($this -> group_members))
+		$this -> loadMembers();
 
-	public function setLogo($argv) {
-		$this -> logo = $argv;
-	}
+	return $this -> total_members;
+}
+
+public function setLogo($argv) {
+	$this -> logo = $argv;
+}
 
 }
 
@@ -707,12 +735,12 @@ class JoinedGroups {
 				$sel .= " AND ge.group_admin='{$onlyadmin}'";
 
 			$query = "SELECT ge.*, jd.id AS joinedid, g.type AS grouptype
-		  		  FROM groups_joined jd
-		          INNER JOIN groups_element ge
-		          ON jd.group_id=ge.id
-		          INNER JOIN groups g
-		          ON ge.id_group=g.id
-		          WHERE jd.char_id='{$charid}'" . $sel;
+			FROM groups_joined jd
+			INNER JOIN groups_element ge
+			ON jd.group_id=ge.id
+			INNER JOIN groups g
+			ON ge.id_group=g.id
+			WHERE jd.char_id='{$charid}'" . $sel;
 		}
 
 		if (isset($query)) {
