@@ -191,7 +191,6 @@ class GroupElement {
 				if($v->getAutoRemove()){ //remove it
 					$delAb=new BuyedAbility();
 					$delAb->deleteBuyedAbility($leaving_char_id,$v);
-
 				} 	
 			}
 
@@ -202,9 +201,7 @@ class GroupElement {
 				if($v->getAutoRemove()){ //remove it
 					$delItem=new BuyedItem();
 					$delItem->deleteBuyedItem($leaving_char_id,$v);
-
 				} 
-
 				
 			}
 
